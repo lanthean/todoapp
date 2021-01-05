@@ -1,0 +1,89 @@
+#!/bin/bash
+###
+# @Author	Martin Bortel <martin.bortel@gmail.com>
+# @Created	08/12/2020
+# 
+# @Package	bash_scripts
+# @Usage: #run every weekday at 2:30pm
+#   crontab -e
+#   30 14 * * 1-5 /Users/lanthean/Documents/work/docs/notes/todoist/backup_todoist
+###
+
+function f_s_init(){
+	# def vars
+	handle=''
+	script_name=$0
+	N_INPUT_ARGS=$#
+	EXP_ARGS=0
+	
+	ERR=0
+	
+	USAGE=1
+	
+  ##
+  # Init generic functions
+  path=$(pwd)
+  # LOG_FILE=/path/to/log/file
+  LOG_LEVEL="d"
+  if [ ! -d /opt/generic_bash_functions ];then
+    echo "/opt/generic_bash_functions not found, attemting to clone from lanthean's github"
+	cd /opt
+    sudo git clone https://github.com/lanthean/generic_bash_functions.git
+    cd $path
+    sudo chown -R $USER:staff /opt/generic_bash_functions
+  fi
+  source /opt/generic_bash_functions/generic_bash_functions
+  }
+function f_s_bo() {
+  echo "  --"
+  echo " | Handling $handle"
+  echo "  -"
+  }
+function f_s_eo() {
+	if [[ $USAGE == 1 ]];then
+		# if f_s_usage called, do not print eof
+		echo "  -"
+		echo " | eo"
+		echo "  --"
+	fi
+  }
+function f_s_usage() {
+
+	USAGE=0	# Usage is called, do not print eof
+
+    echo " -"
+    echo "| Usage $script_name {o1} {o2}"
+    echo " --"
+  }
+function f_export_todoist() {
+  #put here the code
+  if [[ $EXP_ARGS -le $# ]]; then
+    if [[ -n $1 ]];then
+      renamed_todoist_file=$1
+    else
+      renamed_todoist_file=$(date +%Y%m%d_%H%M%S)_todoist.csv
+    fi
+    CDN=/Users/lanthean/Documents/work/docs/notes
+    log i "Perform TODOIST backup"
+    log d "pushd to $CDN/todoist"
+    pushd $CDN/todoist
+    log d "wget CSV"
+    /usr/local/bin/wget -O $renamed_todoist_file https://darekkay.com/todoist-export/download?token=5772cc4f7ff91151e73dadc20ea0ded54ac48550&format=csv
+    # sleep 5
+    # todoist_file=$(find . -name "download*")
+    # log d "mv $todoist_file to $renamed_todoist_file"
+    # mv $todoist_file $renamed_todoist_file
+    popd
+    log i "..done"
+  else
+    f_s_usage
+  fi
+  }
+
+#@run the code
+f_s_init $@
+f_s_bo
+f_export_todoist $@
+f_s_eo
+#EOF
+###
