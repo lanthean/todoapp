@@ -10,6 +10,7 @@
 # Imports
 import logging
 import csv
+import io
 
 class todocsv():
     """
@@ -52,6 +53,20 @@ class todocsv():
                     'responsible_uid': row['responsible_uid']
                     }
         # eo: load_csv()
+
+    def to_utf8(self, lst):
+        return [str(elem).encode('utf-8') for elem in lst]
+
+    def write2file(self, file_name, fields, data, db_file='./todoapp.db'):
+        """
+        Write data to csv file
+        """
+        with io.open(file_name, 'w', encoding='utf8') as csv_file:
+            writer = csv.DictWriter(csv_file, fieldnames=str(fields))
+            writer.writeheader()
+            for row in data.values():
+                writer.writerow(str(row))
+        # eo: write2file()
     # eo: todocsv
 # EOF
 ###

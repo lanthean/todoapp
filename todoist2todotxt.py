@@ -8,12 +8,11 @@
 """
 
 # Imports
-import os
 import logging
-import csv
 
 # local imports
 from todocommon import todocsv
+from tododb import tododb
 
 class todoist2todotxt():
     """
